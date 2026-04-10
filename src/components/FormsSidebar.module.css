@@ -1,0 +1,75 @@
+.panel {
+  width: 247px;
+  min-height: calc(100vh - 56px);
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-subtler);
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  padding: 0 24px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-heading);
+  line-height: normal;
+  flex: 1;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.tabWrapper {
+  padding: 0 12px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-inverse-subtler);
+  text-decoration: none;
+  letter-spacing: -0.24px;
+  line-height: 20px;
+  white-space: nowrap;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.navItem:hover {
+  background: var(--bg-surface-sunken);
+}
+
+.navItem.active {
+  background: var(--bg-brand-subtlest);
+  color: var(--text-link);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.label {
+  white-space: nowrap;
+}

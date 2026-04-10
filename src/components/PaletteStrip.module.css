@@ -1,0 +1,46 @@
+.strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-neutral-text-secondary);
+  width: 48px;
+  flex-shrink: 0;
+}
+
+.swatches {
+  display: flex;
+  gap: 2px;
+}
+
+.swatchWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: background-color 0.15s;
+}
+
+.swatch.active {
+  outline: 2px solid var(--color-neutral-text);
+  outline-offset: 1px;
+}
+
+.toneLabel {
+  font-size: 8px;
+  color: var(--color-neutral-text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
