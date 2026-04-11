@@ -105,22 +105,24 @@ export function FormsContent() {
             </div>
 
             <button className={styles.filterBtn}>
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <circle cx="7" cy="7" r="2.5" stroke="currentColor" strokeWidth="1.3"/>
-                <circle cx="13" cy="8" r="2" stroke="currentColor" strokeWidth="1.3"/>
-                <path d="M2 16c0-2.76 2.24-4 5-4s5 1.24 5 4" stroke="currentColor" strokeWidth="1.3"/>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="9" cy="7" r="3" stroke="currentColor" strokeWidth="1.5"/>
+                <circle cx="17" cy="9" r="2.5" stroke="currentColor" strokeWidth="1.5"/>
+                <path d="M2 20c0-3.31 3.13-6 7-6s7 2.69 7 6" stroke="currentColor" strokeWidth="1.5"/>
+                <path d="M16 14c2.76 0 5 1.79 5 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
               <span>Community in any</span>
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </button>
 
             <button className={styles.filterBtn}>
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <rect x="4" y="4" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="1.3"/>
-                <path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M9 2v3M15 2v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <rect x="5" y="4" width="14" height="17" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+                <path d="M9 10h6M9 14h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
               <span>Function group in any</span>
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </button>
           </div>
 

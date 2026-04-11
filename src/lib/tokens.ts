@@ -213,6 +213,10 @@ export const semanticTokens: Record<string, { light: string; dark: string }> = {
   '--bg-accent-purple-subtlest': { light: '#FAF5FF', dark: '#3B0764' },
   '--bg-accent-purple-subtler':  { light: '#F3E8FF', dark: '#581C87' },
   '--bg-accent-purple-subtle':   { light: '#E9D5FF', dark: '#6B21A8' },
+  // Fixed accent colors (icon backgrounds in table rows)
+  '--green-500':    { light: '#22C55E', dark: '#22C55E' },
+  '--yellow-500':   { light: '#EAB308', dark: '#EAB308' },
+  '--orange-400':   { light: '#FB923C', dark: '#FB923C' },
   // Avatar / soft colors (not in Figma Brands — kept from original)
   '--purple-light': { light: '#cac2ff', dark: '#5b4fc4' },
   '--yellow-light': { light: '#fbdfb1', dark: '#7c5c1e' },
