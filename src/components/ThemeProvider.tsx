@@ -27,12 +27,27 @@ interface ThemeState {
   mainPalette: TonalScale;
   buttonPalette: TonalScale;
   linkPalette: TonalScale;
+  // Dark-mode overrides: null = auto (derive from light seed), hex = use literally
+  darkMainColor: string | null;
+  darkButtonColor: string | null;
+  darkLinkColor: string | null;
+  darkMainPalette: TonalScale;
+  darkButtonPalette: TonalScale;
+  darkLinkPalette: TonalScale;
   setMainColor: (hex: string) => void;
   setButtonColor: (hex: string) => void;
   setLinkColor: (hex: string) => void;
+  setDarkMainColor: (hex: string | null) => void;
+  setDarkButtonColor: (hex: string | null) => void;
+  setDarkLinkColor: (hex: string | null) => void;
   setMode: (mode: Mode) => void;
   toggleMode: () => void;
-  setAllColors: (main: string, button: string, link: string) => void;
+  setAllColors: (
+    main: string,
+    button: string,
+    link: string,
+    darkOverrides?: { main?: string; button?: string; link?: string },
+  ) => void;
   getActiveTones: (role: 'main' | 'button' | 'link') => number[];
 }
 
@@ -50,35 +65,79 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [linkColor, setLinkColor] = useState(defaultPreset.link);
   const [mode, setMode] = useState<Mode>('light');
 
+  // Dark overrides: null = auto (algorithm derives from light seed)
+  const [darkMainColor, setDarkMainColor] = useState<string | null>(null);
+  const [darkButtonColor, setDarkButtonColor] = useState<string | null>(null);
+  const [darkLinkColor, setDarkLinkColor] = useState<string | null>(null);
+
   const mainPalette = useMemo(() => generatePalette(mainColor), [mainColor]);
   const buttonPalette = useMemo(() => generatePalette(buttonColor), [buttonColor]);
   const linkPalette = useMemo(() => generatePalette(linkColor), [linkColor]);
+
+  // Override palettes — only used in dark mode when an override is set.
+  // Fall back to light palette so the type is always a valid TonalScale.
+  const darkMainPalette = useMemo(
+    () => (darkMainColor ? generatePalette(darkMainColor) : mainPalette),
+    [darkMainColor, mainPalette],
+  );
+  const darkButtonPalette = useMemo(
+    () => (darkButtonColor ? generatePalette(darkButtonColor) : buttonPalette),
+    [darkButtonColor, buttonPalette],
+  );
+  const darkLinkPalette = useMemo(
+    () => (darkLinkColor ? generatePalette(darkLinkColor) : linkPalette),
+    [darkLinkColor, linkPalette],
+  );
 
   useEffect(() => {
     const tokens = resolveAllTokens(
       mainPalette, buttonPalette, linkPalette, mode,
       mainColor, buttonColor, linkColor,
+      { main: darkMainColor, button: darkButtonColor, link: darkLinkColor },
     );
     applyTokensToRoot(tokens);
     document.documentElement.setAttribute('data-mode', mode);
-  }, [mainPalette, buttonPalette, linkPalette, mode, mainColor, buttonColor, linkColor]);
+  }, [mainPalette, buttonPalette, linkPalette, mode, mainColor, buttonColor, linkColor, darkMainColor, darkButtonColor, darkLinkColor]);
 
   const toggleMode = useCallback(() => {
     setMode((m) => (m === 'light' ? 'dark' : 'light'));
   }, []);
 
-  const setAllColors = useCallback((main: string, button: string, link: string) => {
-    setMainColor(main);
-    setButtonColor(button);
-    setLinkColor(link);
-  }, []);
+  const setAllColors = useCallback(
+    (
+      main: string,
+      button: string,
+      link: string,
+      darkOverrides?: { main?: string; button?: string; link?: string },
+    ) => {
+      setMainColor(main);
+      setButtonColor(button);
+      setLinkColor(link);
+      // Preset switch replaces any stale dark overrides. If the preset
+      // provides explicit dark values, apply them; otherwise clear to auto.
+      setDarkMainColor(darkOverrides?.main ?? null);
+      setDarkButtonColor(darkOverrides?.button ?? null);
+      setDarkLinkColor(darkOverrides?.link ?? null);
+    },
+    [],
+  );
 
   const getActiveTonesForRole = useCallback(
     (role: 'main' | 'button' | 'link') => {
-      const hex = role === 'main' ? mainColor : role === 'button' ? buttonColor : linkColor;
-      return getActiveTones(role, mode, hex);
+      // In dark mode with an override, active tones are computed against the
+      // override-seeded palette so the strip highlights the right swatch.
+      const darkOverride =
+        mode === 'dark'
+          ? role === 'main'
+            ? darkMainColor
+            : role === 'button'
+              ? darkButtonColor
+              : darkLinkColor
+          : null;
+      const lightHex = role === 'main' ? mainColor : role === 'button' ? buttonColor : linkColor;
+      return getActiveTones(role, mode, darkOverride ?? lightHex);
     },
-    [mode, mainColor, buttonColor, linkColor],
+    [mode, mainColor, buttonColor, linkColor, darkMainColor, darkButtonColor, darkLinkColor],
   );
 
   const value = useMemo<ThemeState>(
@@ -90,15 +149,30 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       mainPalette,
       buttonPalette,
       linkPalette,
+      darkMainColor,
+      darkButtonColor,
+      darkLinkColor,
+      darkMainPalette,
+      darkButtonPalette,
+      darkLinkPalette,
       setMainColor,
       setButtonColor,
       setLinkColor,
+      setDarkMainColor,
+      setDarkButtonColor,
+      setDarkLinkColor,
       setMode,
       toggleMode,
       setAllColors,
       getActiveTones: getActiveTonesForRole,
     }),
-    [mainColor, buttonColor, linkColor, mode, mainPalette, buttonPalette, linkPalette, toggleMode, setAllColors, getActiveTonesForRole],
+    [
+      mainColor, buttonColor, linkColor, mode,
+      mainPalette, buttonPalette, linkPalette,
+      darkMainColor, darkButtonColor, darkLinkColor,
+      darkMainPalette, darkButtonPalette, darkLinkPalette,
+      toggleMode, setAllColors, getActiveTonesForRole,
+    ],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

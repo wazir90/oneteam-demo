@@ -10,9 +10,16 @@ import {
   linkTokens,
   neutralTokens,
   semanticTokens,
+  primaryTokens,
   type Mode,
   type TokenMapping,
 } from './tokens';
+
+export interface DarkOverrides {
+  main?: string | null;
+  button?: string | null;
+  link?: string | null;
+}
 
 export type TonalScale = Record<number, string>;
 
@@ -56,9 +63,18 @@ function resolveDynamicTokens(
   tokenMap: Record<string, TokenMapping>,
   mode: Mode,
   seedTone: number,
+  primaryTokenList?: readonly string[],
+  overrideHex?: string,
 ): Record<string, string> {
   const result: Record<string, string> = {};
+  const primarySet = primaryTokenList ? new Set(primaryTokenList) : null;
   for (const [token, mapping] of Object.entries(tokenMap)) {
+    if (overrideHex && primarySet?.has(token)) {
+      // User explicitly picked this color for dark mode — use it verbatim,
+      // skip tone remapping.
+      result[token] = overrideHex;
+      continue;
+    }
     const resolver = mode === 'light' ? mapping.light : mapping.dark;
     const tone = typeof resolver === 'function' ? resolver(seedTone) : resolver;
     result[token] = palette[tone];
@@ -92,11 +108,27 @@ export function resolveAllTokens(
   mainHex: string,
   buttonHex: string,
   linkHex: string,
+  darkOverrides?: DarkOverrides,
 ): Record<string, string> {
+  // When a dark override is set, swap that role's palette + seed to the override hex
+  // so hover/active/subtle variants harmonize with the user's chosen dark color.
+  const useOverride = mode === 'dark' && darkOverrides;
+  const mainOverride = useOverride ? darkOverrides.main ?? undefined : undefined;
+  const buttonOverride = useOverride ? darkOverrides.button ?? undefined : undefined;
+  const linkOverride = useOverride ? darkOverrides.link ?? undefined : undefined;
+
+  const effMainPalette = mainOverride ? generatePalette(mainOverride) : mainPalette;
+  const effButtonPalette = buttonOverride ? generatePalette(buttonOverride) : buttonPalette;
+  const effLinkPalette = linkOverride ? generatePalette(linkOverride) : linkPalette;
+
+  const effMainHex = mainOverride ?? mainHex;
+  const effButtonHex = buttonOverride ?? buttonHex;
+  const effLinkHex = linkOverride ?? linkHex;
+
   return {
-    ...resolveDynamicTokens(mainPalette, mainTokens, mode, getSeedTone(mainHex)),
-    ...resolveDynamicTokens(buttonPalette, buttonTokens, mode, getSeedTone(buttonHex)),
-    ...resolveDynamicTokens(linkPalette, linkTokens, mode, getSeedTone(linkHex)),
+    ...resolveDynamicTokens(effMainPalette, mainTokens, mode, getSeedTone(effMainHex), primaryTokens.main, mainOverride),
+    ...resolveDynamicTokens(effButtonPalette, buttonTokens, mode, getSeedTone(effButtonHex), primaryTokens.button, buttonOverride),
+    ...resolveDynamicTokens(effLinkPalette, linkTokens, mode, getSeedTone(effLinkHex), primaryTokens.link, linkOverride),
     ...resolveStaticTokens(mode),
   };
 }

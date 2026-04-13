@@ -72,6 +72,21 @@ function adaptOnNeutral(offset = 0): TokenMapping {
   };
 }
 
+/**
+ * The "primary" token for each role — the one that represents the brand color itself.
+ * When a dark-mode override is set, this token receives the override hex literally
+ * (no tone remapping). All other tokens in the role are still palette-derived so
+ * hover/active/subtle variants remain harmonious.
+ */
+export const primaryTokens: Record<'main' | 'button' | 'link', readonly string[]> = {
+  // Main brand surfaces — both the accent bg AND the top bar render the user's
+  // chosen color literally. Without this, the top bar's own tone clamp would
+  // fight a pure-white (or otherwise extreme) override.
+  main: ['--bg-brand', '--bg-top-bar'],
+  button: ['--bg-button'],
+  link: ['--text-link'],
+};
+
 // --- Dynamic brand tokens (generated from "Main" seed via tonal palette) ---
 
 export const mainTokens: Record<string, TokenMapping> = {

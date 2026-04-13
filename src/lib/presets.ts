@@ -3,6 +3,12 @@ export interface BrandPreset {
   main: string;
   button: string;
   link: string;
+  // Optional explicit dark-mode brand colors. When omitted, the algorithm
+  // derives dark colors from the light seed. When present, these override
+  // the algorithm for brands with specific dark-mode guidelines.
+  darkMain?: string;
+  darkButton?: string;
+  darkLink?: string;
 }
 
 export const presets: Record<string, BrandPreset> = {

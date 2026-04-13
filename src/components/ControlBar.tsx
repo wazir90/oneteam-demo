@@ -33,9 +33,67 @@ function ColorPicker({
   );
 }
 
+/**
+ * Dark-override picker. When `value` is null the role is in "auto" mode
+ * (algorithm derives dark from the light seed). Picking a color sets an
+ * explicit override; the reset button clears it back to auto.
+ */
+function DarkOverridePicker({
+  label,
+  value,
+  fallback,
+  onChange,
+}: {
+  label: string;
+  value: string | null;
+  fallback: string;
+  onChange: (hex: string | null) => void;
+}) {
+  const isAuto = value === null;
+  const displayValue = value ?? fallback;
+  return (
+    <div className={`${styles.colorPicker} ${isAuto ? styles.auto : ''}`}>
+      <div className={styles.pickerWrapper}>
+        <input
+          type="color"
+          value={displayValue}
+          onChange={(e) => onChange(e.target.value)}
+          className={styles.picker}
+        />
+      </div>
+      <div className={styles.pickerInfo}>
+        <span className={styles.pickerLabel}>{label}</span>
+        <span className={styles.hexValue}>
+          {isAuto ? 'AUTO' : displayValue.toUpperCase()}
+        </span>
+      </div>
+      {!isAuto && (
+        <button
+          type="button"
+          className={styles.resetBtn}
+          onClick={() => onChange(null)}
+          title="Reset to auto"
+          aria-label="Reset to auto"
+        >
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M2 2l6 6M8 2L2 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function ControlBar() {
   const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
+
+  const isDark = theme.mode === 'dark';
+  // In dark mode with overrides active, show the override-seeded palette
+  // so active-tone markers line up with the colors actually applied.
+  const mainStripPalette = isDark && theme.darkMainColor ? theme.darkMainPalette : theme.mainPalette;
+  const buttonStripPalette = isDark && theme.darkButtonColor ? theme.darkButtonPalette : theme.buttonPalette;
+  const linkStripPalette = isDark && theme.darkLinkColor ? theme.darkLinkPalette : theme.linkPalette;
 
   return (
     <div className={`${styles.controlBar} ${expanded ? styles.expanded : ''}`}>
@@ -43,20 +101,53 @@ export function ControlBar() {
       {expanded && (
         <div className={styles.paletteSection}>
           <PaletteStrip
-            palette={theme.mainPalette}
+            palette={mainStripPalette}
             activeTones={theme.getActiveTones('main')}
             label="Main"
           />
           <PaletteStrip
-            palette={theme.buttonPalette}
+            palette={buttonStripPalette}
             activeTones={theme.getActiveTones('button')}
             label="Button"
           />
           <PaletteStrip
-            palette={theme.linkPalette}
+            palette={linkStripPalette}
             activeTones={theme.getActiveTones('link')}
             label="Link"
           />
+        </div>
+      )}
+
+      {/* Dark overrides row — visible only in dark mode */}
+      {isDark && (
+        <div className={styles.bar}>
+          <div className={styles.darkLabel} title="Override dark-mode colors. Leave AUTO to let the algorithm derive them from the light seed.">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M21.75 15.5a9.72 9.72 0 01-13.25-13.25A10 10 0 1021.75 15.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span>Dark</span>
+          </div>
+          <div className={styles.divider} />
+          <div className={styles.pickers}>
+            <DarkOverridePicker
+              label="Main"
+              value={theme.darkMainColor}
+              fallback={theme.mainColor}
+              onChange={theme.setDarkMainColor}
+            />
+            <DarkOverridePicker
+              label="Button"
+              value={theme.darkButtonColor}
+              fallback={theme.buttonColor}
+              onChange={theme.setDarkButtonColor}
+            />
+            <DarkOverridePicker
+              label="Link"
+              value={theme.darkLinkColor}
+              fallback={theme.linkColor}
+              onChange={theme.setDarkLinkColor}
+            />
+          </div>
         </div>
       )}
 
@@ -90,7 +181,11 @@ export function ControlBar() {
               key={key}
               className={styles.presetBtn}
               onClick={() =>
-                theme.setAllColors(preset.main, preset.button, preset.link)
+                theme.setAllColors(preset.main, preset.button, preset.link, {
+                  main: preset.darkMain,
+                  button: preset.darkButton,
+                  link: preset.darkLink,
+                })
               }
               title={preset.label}
             >
