@@ -32,7 +32,7 @@
   border-radius: 8px;
   border: none;
   background: var(--bg-button);
-  color: var(--text-inverse);
+  color: var(--text-on-button);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;

@@ -17,17 +17,17 @@ const forms = [
 ];
 
 const quickActions = [
-  { label: 'Create form', iconBg: 'var(--bg-button)', icon: 'plus' },
+  { label: 'Create form', iconBg: 'var(--bg-button)', iconFg: 'var(--text-on-button)', icon: 'plus' },
   { label: 'PTO Request', iconBg: 'var(--bg-warning)', icon: 'user' },
   { label: 'Sick Leave Notification', iconBg: 'var(--bg-success)', icon: 'building' },
   { label: 'Birthday Announcement', iconBg: 'var(--yellow-500)', icon: 'cake' },
 ];
 
-function FormIcon({ type, bg }: { type: string; bg: string }) {
+function FormIcon({ type, bg, fg }: { type: string; bg: string; fg?: string }) {
   return (
-    <div className={styles.formIcon} style={{ backgroundColor: bg }}>
+    <div className={styles.formIcon} style={{ backgroundColor: bg, color: fg }}>
       {type === 'plus' && (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
       )}
       {type === 'user' && (
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="white" strokeWidth="1.5"/><path d="M2 14c0-3 2.69-5 6-5s6 2 6 5" stroke="white" strokeWidth="1.5"/></svg>
@@ -88,7 +88,7 @@ export function FormsContent() {
           <div className={styles.quickActions}>
             {quickActions.map((action) => (
               <button key={action.label} className={styles.actionCard}>
-                <FormIcon type={action.icon} bg={action.iconBg} />
+                <FormIcon type={action.icon} bg={action.iconBg} fg={action.iconFg} />
                 <span className={styles.actionLabel}>{action.label}</span>
               </button>
             ))}

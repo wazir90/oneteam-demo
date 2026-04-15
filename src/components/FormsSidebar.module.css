@@ -58,7 +58,7 @@
 
 .navItem.active {
   background: var(--bg-brand-subtlest);
-  color: var(--text-link);
+  color: var(--icons-brand);
 }
 
 .icon {
