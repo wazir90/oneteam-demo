@@ -69,9 +69,21 @@
 }
 
 .iconBtn:hover {
-  color: var(--text-heading);
+  color: var(--icons-subtle-hover);
+}
+
+.iconBtn:active {
+  color: var(--icons-subtle-active);
 }
 
 .navItem.active .iconBtn {
   color: var(--icons-brand, #2563eb);
+}
+
+.navItem.active .iconBtn:hover {
+  color: var(--icons-brand-hover);
+}
+
+.navItem.active .iconBtn:active {
+  color: var(--icons-brand-active);
 }

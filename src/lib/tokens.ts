@@ -84,7 +84,10 @@ export const primaryTokens: Record<'main' | 'button' | 'link', readonly string[]
   // fight a pure-white (or otherwise extreme) override.
   main: ['--bg-brand', '--bg-top-bar'],
   button: ['--bg-button'],
-  link: ['--text-link'],
+  // Link text renders on a neutral surface, so it must always go through
+  // the adaptive tone resolver — using the picked hex verbatim would make
+  // dark seeds (e.g. #000000) unreadable on the dark surface.
+  link: [],
 };
 
 // --- Dynamic brand tokens (generated from "Main" seed via tonal palette) ---

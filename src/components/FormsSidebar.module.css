@@ -61,6 +61,16 @@
   color: var(--icons-brand);
 }
 
+.navItem.active:hover {
+  background: var(--bg-brand-subtler);
+  color: var(--text-link-hover);
+}
+
+.navItem.active:active {
+  background: var(--bg-brand-subtle);
+  color: var(--text-link-active);
+}
+
 .icon {
   display: flex;
   align-items: center;

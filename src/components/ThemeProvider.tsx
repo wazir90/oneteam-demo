@@ -48,7 +48,30 @@ interface ThemeState {
     link: string,
     darkOverrides?: { main?: string; button?: string; link?: string },
   ) => void;
+  saveChanges: () => void;
+  resetToDefaults: () => void;
   getActiveTones: (role: 'main' | 'button' | 'link') => number[];
+}
+
+const STORAGE_KEY = 'oneteam-theme';
+
+interface PersistedTheme {
+  main: string;
+  button: string;
+  link: string;
+  darkMain: string | null;
+  darkButton: string | null;
+  darkLink: string | null;
+}
+
+function loadPersisted(): PersistedTheme | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as PersistedTheme) : null;
+  } catch {
+    return null;
+  }
 }
 
 const ThemeContext = createContext<ThemeState | null>(null);
@@ -69,6 +92,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [darkMainColor, setDarkMainColor] = useState<string | null>(null);
   const [darkButtonColor, setDarkButtonColor] = useState<string | null>(null);
   const [darkLinkColor, setDarkLinkColor] = useState<string | null>(null);
+
+  // Hydrate from localStorage after mount to avoid SSR/client hydration mismatch.
+  useEffect(() => {
+    const persisted = loadPersisted();
+    if (!persisted) return;
+    setMainColor(persisted.main);
+    setButtonColor(persisted.button);
+    setLinkColor(persisted.link);
+    setDarkMainColor(persisted.darkMain);
+    setDarkButtonColor(persisted.darkButton);
+    setDarkLinkColor(persisted.darkLink);
+  }, []);
 
   const mainPalette = useMemo(() => generatePalette(mainColor), [mainColor]);
   const buttonPalette = useMemo(() => generatePalette(buttonColor), [buttonColor]);
@@ -122,6 +157,31 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const saveChanges = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const payload: PersistedTheme = {
+      main: mainColor,
+      button: buttonColor,
+      link: linkColor,
+      darkMain: darkMainColor,
+      darkButton: darkButtonColor,
+      darkLink: darkLinkColor,
+    };
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  }, [mainColor, buttonColor, linkColor, darkMainColor, darkButtonColor, darkLinkColor]);
+
+  const resetToDefaults = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(STORAGE_KEY);
+    }
+    setMainColor(defaultPreset.main);
+    setButtonColor(defaultPreset.button);
+    setLinkColor(defaultPreset.link);
+    setDarkMainColor(null);
+    setDarkButtonColor(null);
+    setDarkLinkColor(null);
+  }, []);
+
   const getActiveTonesForRole = useCallback(
     (role: 'main' | 'button' | 'link') => {
       // In dark mode with an override, active tones are computed against the
@@ -164,6 +224,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setMode,
       toggleMode,
       setAllColors,
+      saveChanges,
+      resetToDefaults,
       getActiveTones: getActiveTonesForRole,
     }),
     [
@@ -171,7 +233,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       mainPalette, buttonPalette, linkPalette,
       darkMainColor, darkButtonColor, darkLinkColor,
       darkMainPalette, darkButtonPalette, darkLinkPalette,
-      toggleMode, setAllColors, getActiveTonesForRole,
+      toggleMode, setAllColors, saveChanges, resetToDefaults, getActiveTonesForRole,
     ],
   );
 
